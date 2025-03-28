@@ -1,4 +1,5 @@
 import pulumi
+import pulumi_aws as aws
 import pulumi_awsx as awsx
 import pulumi_eks as eks
 import pulumi_kubernetes as k8s
@@ -10,6 +11,7 @@ max_cluster_size = config.get_int("maxClusterSize", 6)
 desired_cluster_size = config.get_int("desiredClusterSize", 3)
 eks_node_instance_type = config.get("eksNodeInstanceType", "t3.nano")
 vpc_network_cidr = config.get("vpcNetworkCidr", "10.40.0.0/16")
+sso_role_arn = config.require("ssoRoleArn")
 
 # Create a VPC for the EKS cluster
 eks_vpc = awsx.ec2.Vpc("eks-vpc",
@@ -35,8 +37,23 @@ eks_cluster = eks.Cluster("eks-cluster",
     node_associate_public_ip_address=False,
     # Change these values for a private cluster (VPN access required)
     endpoint_private_access=False,
-    endpoint_public_access=True
-    )
+    endpoint_public_access=True,
+    access_entries={
+        "portaladmin": eks.AccessEntryArgs(
+            principal_arn=sso_role_arn,
+            access_policies={
+                "fullAccess": eks.AccessPolicyAssociationArgs(
+                    policy_arn="arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy",
+                    access_scope=aws.eks.AccessPolicyAssociationAccessScopeArgs(
+                        type="cluster",
+                        namespaces=[]
+                    )
+                )
+            },
+            type=eks.AccessEntryType.STANDARD,
+        )
+    },
+)
 
 # Create a Kubernetes provider instance that uses our cluster from above.
 cluster = k8s.Provider("cluster",

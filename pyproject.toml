@@ -10,3 +10,7 @@ dependencies = [
     "pulumi-eks>=3.8.1",
     "pulumi-kubernetes>=4.22.1",
 ]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
