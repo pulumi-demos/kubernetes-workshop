@@ -1,5 +1,5 @@
 name: kubernetes-workshop
-description: A set of kubernetes constructs
+description: Kubernetes Workshop with Pulumi
 runtime:
   name: python
   options:

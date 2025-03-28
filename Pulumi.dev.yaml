@@ -1,4 +1,2 @@
 config:
   aws:region: eu-west-2
-environment:
-  - default/aws
