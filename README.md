@@ -48,7 +48,8 @@ graph TD;
 ## Requirements
 
 - **Pulumi CLI** – for managing infrastructure as code.
-- **Python 3.13+** – the runtime environment.
+- **Python 3** – the runtime environment.
+- **uv** – for Python dependency management (faster alternative to pip and venv).
 - **AWS CLI** – configured with appropriate credentials.
 - **Access to an AWS Account** – to provision the resources.
 - **kubectl** – for interacting with Kubernetes clusters.
@@ -101,13 +102,30 @@ cd kubernetes-workshop
 
 2. **Set Up Python Environment**
 
+This project uses [uv](https://github.com/astral-sh/uv) for Python dependency management. uv is a fast, reliable Python package installer and resolver that serves as a replacement for pip and virtualenv.
+
+If you don't have uv installed, you can install it with:
+
 ```sh
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+# Install uv using pip (works on most platforms)
+pip install uv
+
+# Or using Homebrew (for macOS users)
+brew install uv
 ```
 
-1. **Configure Pulumi**
+Then set up your environment with uv:
+
+```sh
+# Create and activate a virtual environment
+uv venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Install dependencies from pyproject.toml (uv.lock ensures consistent versions)
+uv pip install --no-deps -e .
+```
+
+3. **Configure Pulumi**
 
 Make sure you have Pulumi installed and configured on your machine. Then, set up your AWS credentials:
 
@@ -148,3 +166,6 @@ cd workshops/exercise-01-eks
 
 - **Custom Resources:**  
   Custom Resource Definitions (CRDs) are managed using strongly-typed Pulumi classes generated from cert-manager CRDs, demonstrating how to work with custom resources in a type-safe manner.
+
+- **Python Dependency Management with uv:**  
+  This project uses [uv](https://github.com/astral-sh/uv) for Python dependency management. uv is configured as the toolchain in the Pulumi.yaml file, which means Pulumi will use uv to manage Python dependencies instead of pip and virtualenv. The project includes a uv.lock file that ensures consistent dependency versions across different environments. When you run Pulumi commands, it will automatically use uv to install and manage dependencies defined in pyproject.toml.
